@@ -13,31 +13,40 @@ export class PostagemService{
 
   async findAll(): Promise<Postagem[]>{
     // SELECT * FROM tb_postagens
-    return this.postagemRepository.find();
+    return this.postagemRepository.find({
+        relations:{
+          tema: true
+        }
+  });
   }
 
-  async findById(id: number): Promise<Postagem>{
-    //SELECT * FROM tb_postagens WERE id =?; o que o usario vai digitar
-    const postagem = await this.postagemRepository.findOne({
-      where:{
-        id
-      }
-    })
+ async findById(id: number): Promise<Postagem> {
+        // SELECT * FROM tb_postagens WHERE id = ?;
+        const postagem = await this.postagemRepository.findOne({
+            where: {
+                id,
+            },
+            relations:{
+                tema: true
+            }
+        });
 
     if (!postagem)
       throw new HttpException('Postagem não encontrada!', HttpStatus.NOT_FOUND);
 
     return postagem;
   }
-
-  async findAllByTitulo(titulo: string): Promise<Postagem[]>{
-    // SELEC * FROM tb_postagens WHERE titulo LIKE '%?%';
-    return this.postagemRepository.find({
-      where:{
-        titulo: ILike(`%${titulo}%`)
-      }
-    })
-  }
+    async findAllByTitulo(titulo: string): Promise<Postagem[]> {
+        // SELECT * FROM tb_postagens WHERE titulo LIKE '%?%';
+        return this.postagemRepository.find({
+            where: {
+                titulo: ILike(`%${titulo}%`),
+            },
+            relations:{
+                tema: true
+            }
+        });
+    }
 
   async create(postagem: Postagem): Promise<Postagem>{
     // INSERT INTO tb_postagens (titulo, texto) VALLUES (?,?);
